@@ -37,8 +37,12 @@ namespace Shop.Controllers
 
             try
             {
+                // Forçando o usuário a ser sempre "funcionário"
+                model.Role = "employee";
+
                 context.Users.Add(model);
                 await context.SaveChangesAsync();
+                model.Password = "";
                 return model;
             }
             catch (Exception e)
