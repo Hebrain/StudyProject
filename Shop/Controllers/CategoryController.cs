@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shop.Data;
 using Shop.Models;
@@ -15,6 +16,7 @@ namespace Shop.Controllers
 
         [HttpGet]
         [Route("")]
+        [AllowAnonymous]
         public async Task<ActionResult<List<Category>>> Get([FromServices] DataContext context)
         {
             var categories = await context
@@ -28,6 +30,7 @@ namespace Shop.Controllers
 
         [HttpGet]
         [Route("{id:int}")]
+        [AllowAnonymous]
         public async Task<ActionResult<Category>> GetById(int id, [FromServices] DataContext context)
         {
             var categoria = await context
@@ -41,6 +44,7 @@ namespace Shop.Controllers
 
         [HttpPost]
         [Route("")]
+        [Authorize(Roles = "employee")]
         public async Task<ActionResult<Category>> Post([FromBody]Category model, [FromServices]DataContext context)
         {
             if (!ModelState.IsValid)
@@ -61,6 +65,7 @@ namespace Shop.Controllers
 
         [HttpPut]
         [Route("{id:int}")]
+        [Authorize(Roles = "employee")]
         public async Task<ActionResult<Category>> Put(int id, [FromBody]Category model, [FromServices]DataContext context)
         {
             // Verifica se o ID informado é o mesmo do modelo
@@ -90,6 +95,7 @@ namespace Shop.Controllers
 
         [HttpDelete]
         [Route("{id:int}")]
+        [Authorize(Roles = "employee")]
         public async Task<ActionResult<Category>> Delete(int id, [FromServices]DataContext context)
         {
             var category = await context.Categories.FirstOrDefaultAsync(x => x.Id == id);
@@ -100,7 +106,7 @@ namespace Shop.Controllers
             {
                 context.Categories.Remove(category);
                 await context.SaveChangesAsync();
-                return Ok(new { messege = "Categoria removida com sucesso"});
+                return Ok(category);
             }
             catch (Exception)
             {
